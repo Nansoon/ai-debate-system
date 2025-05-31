@@ -1,6 +1,8 @@
 
 import os
 import json
+import streamlit as st
+
 
 def save_state(topic, chat_history, round_no):
     with open(f"data/{topic}.json", "w", encoding="utf-8") as f:
@@ -41,5 +43,19 @@ def list_saved_debates():
 
 
 def load_config():
-    with open("config.json", "r", encoding="utf-8") as f:
-        return json.load(f)
+    # ✅ 优先使用云端部署的 secrets
+    if st.secrets and "openai_api_key" in st.secrets:
+        return {
+            "openai_api_key": st.secrets["openai_api_key"],
+            "openai_base_url": st.secrets["openai_base_url"],
+            "openai_model": st.secrets.get("openai_model", "gpt-4-turbo"),
+            "deepseek_api_key": st.secrets["deepseek_api_key"],
+            "deepseek_api_url": st.secrets["deepseek_api_url"]
+        }
+    # ✅ 否则回退到本地 config.json 文件（用于开发调试）
+    elif os.path.exists("config.json"):
+        with open("config.json", "r", encoding="utf-8") as f:
+            return json.load(f)
+    else:
+        raise FileNotFoundError("No config.json found, and st.secrets is not set.")
+
