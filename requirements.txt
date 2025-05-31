@@ -4,3 +4,4 @@ requests
 python-docx
 matplotlib
 httpx
+openai>=1.3.5
