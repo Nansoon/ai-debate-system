@@ -23,7 +23,7 @@ def check_password():
         if st.button("登录"):
             if pwd == st.secrets["login_password"]:
                 st.session_state.authenticated = True
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.error("密码错误，请重试。")
         st.stop()
