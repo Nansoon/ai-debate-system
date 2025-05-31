@@ -11,17 +11,35 @@ import matplotlib as mpl
 
 # 密码保护函数：云端启用，开发本地自动跳过
 def check_password():
+    # ✅ 本地跳过密码保护（例如环境变量控制）
     if os.getenv("IS_LOCAL", "false").lower() == "true":
         return
 
+    # ✅ 尝试读取密码（优先从 st.secrets，其次从 config.json）
+    try:
+        expected_password = st.secrets["login_password"]
+    except Exception:
+        # fallback：尝试从 config.json 中读取密码字段（可选）
+        try:
+            with open("config.json", "r", encoding="utf-8") as f:
+                config = json.load(f)
+                expected_password = config["login_password"]
+        except Exception:
+            expected_password = None
+
+    if not expected_password:
+        st.error("❌ 未配置登录密码，请检查 secrets 或 config.json")
+        st.stop()
+
+    # ✅ 执行登录验证
     if "authenticated" not in st.session_state:
         st.session_state.authenticated = False
 
     if not st.session_state.authenticated:
-        st.title("🔐 登录验证")
+        st.markdown("<h2>🔐 登录验证</h2>", unsafe_allow_html=True)
         pwd = st.text_input("请输入访问密码", type="password")
         if st.button("登录"):
-            if pwd == st.secrets["login_password"]:
+            if pwd == expected_password:
                 st.session_state.authenticated = True
                 st.rerun()
             else:
@@ -737,8 +755,8 @@ st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 st.markdown(
     """
     <div class="footer">
-        <p>© 2023 AI 辩论系统 | 基于 ChatGPT 和 DeepSeek AI 技术 | v1.6.0</p>
-        <p>苹果设计风格 | 简洁 · 优雅 · 强大</p>
+        <p>© 2025 AI 辩论系统 | 基于 ChatGPT 和 DeepSeek AI 技术 | v2.0</p>
+        <p>Powered by Nansoon</p>
     </div>
     """, 
     unsafe_allow_html=True

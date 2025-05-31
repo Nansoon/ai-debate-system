@@ -43,19 +43,21 @@ def list_saved_debates():
 
 
 def load_config():
-    # ✅ 优先使用云端部署的 secrets
-    if st.secrets and "openai_api_key" in st.secrets:
-        return {
-            "openai_api_key": st.secrets["openai_api_key"],
-            "openai_base_url": st.secrets["openai_base_url"],
-            "openai_model": st.secrets.get("openai_model", "gpt-4-turbo"),
-            "deepseek_api_key": st.secrets["deepseek_api_key"],
-            "deepseek_api_url": st.secrets["deepseek_api_url"]
-        }
-    # ✅ 否则回退到本地 config.json 文件（用于开发调试）
-    elif os.path.exists("config.json"):
-        with open("config.json", "r", encoding="utf-8") as f:
-            return json.load(f)
-    else:
-        raise FileNotFoundError("No config.json found, and st.secrets is not set.")
+    # ✅ 优先使用云端的 secrets（部署在 Streamlit Cloud）
+    try:
+        if "openai_api_key" in st.secrets:
+            return {
+                "openai_api_key": st.secrets["openai_api_key"],
+                "openai_base_url": st.secrets["openai_base_url"],
+                "openai_model": st.secrets.get("openai_model", "gpt-4"),
+                "deepseek_api_key": st.secrets["deepseek_api_key"],
+                "deepseek_api_url": st.secrets["deepseek_api_url"]
+            }
+    except Exception:
+        pass  # 👈 如果没有 secrets，就自动 fallback 到本地
+
+    # ✅ 本地 fallback：从 config.json 加载
+    with open("config.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
 
