@@ -9,12 +9,33 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 
+# 密码保护函数：云端启用，开发本地自动跳过
+def check_password():
+    if os.getenv("IS_LOCAL", "false").lower() == "true":
+        return
+
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+
+    if not st.session_state.authenticated:
+        st.title("🔐 登录验证")
+        pwd = st.text_input("请输入访问密码", type="password")
+        if st.button("登录"):
+            if pwd == st.secrets["login_password"]:
+                st.session_state.authenticated = True
+                st.experimental_rerun()
+            else:
+                st.error("密码错误，请重试。")
+        st.stop()
+
 # 设置苹果风格主题
 st.set_page_config(
     page_title="AI 辩论系统",
     layout="wide",
     page_icon="🤖"
 )
+
+check_password()
 
 # 创建必要的目录
 os.makedirs("data", exist_ok=True)
