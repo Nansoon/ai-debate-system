@@ -49,7 +49,7 @@ def load_config():
             return {
                 "openai_api_key": st.secrets["openai_api_key"],
                 "openai_base_url": st.secrets["openai_base_url"],
-                "openai_model": st.secrets.get("openai_model", "gpt-4"),
+                "openai_model": st.secrets.get("openai_model", "gpt-4o"),
                 "deepseek_api_key": st.secrets["deepseek_api_key"],
                 "deepseek_api_url": st.secrets["deepseek_api_url"]
             }
